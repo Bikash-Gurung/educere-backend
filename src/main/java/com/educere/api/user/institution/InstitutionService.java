@@ -6,6 +6,7 @@ import com.educere.api.common.enums.UserType;
 import com.educere.api.common.exception.ResourceNotFoundException;
 import com.educere.api.entity.Institution;
 import com.educere.api.entity.Role;
+import com.educere.api.entity.User;
 import com.educere.api.user.auth.dto.SignUpRequest;
 import com.educere.api.user.role.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,14 @@ public class InstitutionService {
     public Institution getById(Long id){
         return institutionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
+    }
+
+    public User updateInstitutionRole(User user) {
+        Institution institution = getById(user.getId());
+        Role roleUser = roleService.findByName(RoleType.ROLE_USER);
+        institution.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));
+
+        return save(institution);
     }
 
     public Institution save(Institution institution) {

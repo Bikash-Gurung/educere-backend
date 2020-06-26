@@ -17,7 +17,7 @@ import com.educere.api.user.auth.dto.AccessTokenRequest;
 import com.educere.api.user.auth.dto.AccessTokenResponse;
 import com.educere.api.user.auth.dto.AuthResponse;
 import com.educere.api.user.auth.dto.LoginRequest;
-import com.educere.api.user.auth.dto.Oauth2SignupRequest;
+import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.SignUpRequest;
 import com.educere.api.user.institution.InstitutionService;
 import com.educere.api.user.member.MemberMapper;
@@ -38,7 +38,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
 @Service
@@ -136,20 +135,22 @@ public class AuthService {
         return memberMapper.toMemberResponse(member);
     }
 
-    public MemberResponse completeOauth2SignUp(Oauth2SignupRequest oauth2SignupRequest,
-                                               UserPrincipal userPrincipal) {
-        Member member = memberService.findById(userPrincipal.getId());
-        member = memberService.updateOauth2Member(oauth2SignupRequest, member);
-        grantNewAuthentication(member);
-        contactVerificationService.createDeviceVerification(member.getId(), ContactType.PHONE);
+    public void completeSignUp(CompleteSignupRequest completeSignupRequest,
+                                       UserPrincipal userPrincipal) {
+        User user = memberService.findById(userPrincipal.getId());
+        user = user.getUserType().equals(UserType.TUTOR) ?
+                tutorService.updateTutorRole(user) :
+                institutionService.updateInstitutionRole(user);
+        grantNewAuthentication(user);
+        contactVerificationService.createDeviceVerification(user.getId(), ContactType.PHONE);
 
-        return memberMapper.toMemberResponse(member);
+//        return memberMapper.toMemberResponse(user);
     }
 
-    private void grantNewAuthentication(Member sender) {
+    private void grantNewAuthentication(User user) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authentication.getAuthorities());
-        List<String> privileges = UserPrincipal.getPrivileges(sender.getRoles());
+        List<String> privileges = UserPrincipal.getPrivileges(user.getRoles());
 
         for (String privilege : privileges) {
             updatedAuthorities.add(new SimpleGrantedAuthority(privilege));

@@ -6,6 +6,8 @@ import com.educere.api.common.enums.UserType;
 import com.educere.api.common.exception.ResourceNotFoundException;
 import com.educere.api.entity.Role;
 import com.educere.api.entity.Tutor;
+import com.educere.api.entity.User;
+import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.SignUpRequest;
 import com.educere.api.user.role.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,14 @@ public class TutorService {
 
     public Tutor getById(Long id){
         return tutorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+    }
+
+    public User updateTutorRole(User user) {
+        Tutor tutor = getById(user.getId());
+        Role roleUser = roleService.findByName(RoleType.ROLE_USER);
+        tutor.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));
+
+        return save(tutor);
     }
 
     public Tutor save(Tutor tutor) {
