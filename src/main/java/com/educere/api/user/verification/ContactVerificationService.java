@@ -65,17 +65,15 @@ public class ContactVerificationService {
     public void createDeviceVerification(Long senderId, ContactType contactType) {
         Member sender = memberService.findById(senderId);
 
-        if (!isDeviceVerified(sender, contactType))
+        if (!isDeviceVerified(sender))
             checkVerificationToken(sender, contactType);
 
         else
             throw new BadRequestException("Your " + contactType.name() + " is already verified.");
     }
 
-    private boolean isDeviceVerified(Member sender, ContactType contactType) {
-        return ContactType.PHONE.equals(contactType)
-                ? sender.isPhoneNumberVerified()
-                : sender.isEmailVerified();
+    private boolean isDeviceVerified(Member sender) {
+        return sender.isEmailVerified();
 
     }
 
@@ -84,7 +82,7 @@ public class ContactVerificationService {
                 ? checkTwoFAVerificationResendAttempts(sender, contactType)
                 : createVerificationToken(sender, contactType);
 
-        sendVerificationMessage(sender, contactType, contactVerification.getToken());
+        sendVerificationMessage(sender, contactVerification.getToken());
     }
 
     private ContactVerification checkTwoFAVerificationResendAttempts(Member sender, ContactType contactType) {
@@ -115,7 +113,8 @@ public class ContactVerificationService {
     }
 
     @Transactional
-    public ContactVerification updateVerificationToken(ContactVerification contactVerification, ContactType contactType) {
+    public ContactVerification updateVerificationToken(ContactVerification contactVerification,
+                                                       ContactType contactType) {
         contactVerification.setToken(generateVerificationCode(contactType));
         contactVerification.setExpiryDate(LocalDateTime.now().plusMinutes(30));
         contactVerification.setVerificationAttempt(0);
@@ -152,22 +151,12 @@ public class ContactVerificationService {
         return VerificationCodeGenerator.generate();
     }
 
-    private void sendVerificationMessage(Member sender, ContactType contactType, String token) {
-        if (ContactType.PHONE.equals(contactType)) {
-            sendPhoneVerificationCode(sender, token);
-        } else {
-            sendVerificationEmail(sender, token);
-        }
+    private void sendVerificationMessage(Member sender, String token) {
+        sendVerificationEmail(sender, token);
     }
 
     private void sendVerificationEmail(Member sender, String token) {
         senderMailService.sendVerificationMail(sender, token);
-    }
-
-    private void sendPhoneVerificationCode(Member sender, String token) {
-        if (environment.acceptsProfiles(Profiles.of(ApplicationEnvironment.PROD.getEnvironment()))) {
-            twilioSmsService.sendVerificationCode(sender.getPhoneNumber(), token.concat(" is your verification code."));
-        }
     }
 
     @Transactional
@@ -189,18 +178,9 @@ public class ContactVerificationService {
             throw new TokenExpiredException("Verification token is expired.");
         }
 
-        switch (contactType) {
-            case PHONE:
-                verifyPhone(member, contactVerification, token);
-                serverSentEventService.emitEvent(ServerSentEvent.PHONE_NUMBER_VERIFIED, member.getReferenceId());
-                break;
-
-            case EMAIL:
-                verifyEmail(contactVerification, token);
-                UUID referenceId = memberService.findById(contactVerification.getUser().getId()).getReferenceId();
-                serverSentEventService.emitEvent(ServerSentEvent.EMAIL_VERIFIED, referenceId);
-                break;
-        }
+        verifyEmail(contactVerification, token);
+        UUID referenceId = memberService.findById(contactVerification.getUser().getId()).getReferenceId();
+        serverSentEventService.emitEvent(ServerSentEvent.EMAIL_VERIFIED, referenceId);
     }
 
     @Transactional
@@ -216,24 +196,6 @@ public class ContactVerificationService {
             contactVerificationRepository.save(contactVerification);
 
             throw new BadRequestException("Invalid verification token.");
-        }
-    }
-
-    @Transactional
-    public void verifyPhone(Member sender, ContactVerification contactVerification, String token) {
-        if (contactVerification.getToken().equals(token)) {
-            contactVerification.setVerifiedAt(LocalDateTime.now());
-            contactVerification.setStatus(ContactVerificationStatus.VERIFIED);
-            contactVerification.setVerificationAttempt(contactVerification.getVerificationAttempt() + 1);
-            contactVerificationRepository.save(contactVerification);
-
-            sender.setPhoneNumberVerified(true);
-            memberRepository.save(sender);
-        } else {
-            contactVerification.setVerificationAttempt(contactVerification.getVerificationAttempt() + 1);
-            contactVerificationRepository.save(contactVerification);
-
-            throw new BadRequestException("Verification code does not match.");
         }
     }
 }

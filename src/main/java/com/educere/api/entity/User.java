@@ -38,12 +38,6 @@ public class User extends AuditModel {
     @Column(nullable = false)
     private boolean emailVerified;
 
-    @Column(unique = true)
-    private String phoneNumber;
-
-    @Column(nullable = false)
-    private boolean phoneNumberVerified;
-
     @JsonIgnore
     private String password;
 

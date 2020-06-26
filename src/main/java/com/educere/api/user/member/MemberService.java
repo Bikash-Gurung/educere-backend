@@ -61,10 +61,6 @@ public class MemberService {
         return memberRepository.existsByEmail(email);
     }
 
-    public Boolean isPhoneDuplicate(String phoneNumber) {
-        return memberRepository.existsByPhoneNumber(phoneNumber);
-    }
-
     public Member create(SignUpRequest signUpRequest) {
         Role roleUser = roleService.findByName(RoleType.ROLE_USER);
         Member member = memberMapper.toMember(signUpRequest);
@@ -79,7 +75,6 @@ public class MemberService {
 
     public Member updateOauth2Member(Oauth2SignupRequest oauth2SignupRequest, Member member) {
         Role roleUser = roleService.findByName(RoleType.ROLE_USER);
-        member.setPhoneNumber(oauth2SignupRequest.getPhoneNumber());
         member.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));
 
         return save(member);
@@ -107,9 +102,6 @@ public class MemberService {
 
         if (!member.isEmailVerified())
             contactVerificationService.resetResendAttempts(member, ContactType.EMAIL);
-
-        if (!member.isPhoneNumberVerified())
-            contactVerificationService.resetResendAttempts(member, ContactType.PHONE);
 
         member.setLoginAttempts(0);
         member.setLocked(false);

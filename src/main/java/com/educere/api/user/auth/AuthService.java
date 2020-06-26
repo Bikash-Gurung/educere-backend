@@ -114,10 +114,6 @@ public class AuthService {
 
     public MemberResponse completeOauth2SignUp(Oauth2SignupRequest oauth2SignupRequest,
                                                UserPrincipal userPrincipal) {
-        if (memberService.isPhoneDuplicate(oauth2SignupRequest.getPhoneNumber())) {
-            throw new BadRequestException("Phone number already in use.");
-        }
-
         Member member = memberService.findById(userPrincipal.getId());
         member = memberService.updateOauth2Member(oauth2SignupRequest, member);
         grantNewAuthentication(member);
