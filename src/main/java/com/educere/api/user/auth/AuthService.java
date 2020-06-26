@@ -2,8 +2,11 @@ package com.educere.api.user.auth;
 
 import com.educere.api.common.enums.ContactType;
 import com.educere.api.common.enums.RoleType;
+import com.educere.api.common.enums.UserType;
 import com.educere.api.common.exception.BadRequestException;
+import com.educere.api.entity.Institution;
 import com.educere.api.entity.Member;
+import com.educere.api.entity.Tutor;
 import com.educere.api.entity.User;
 import com.educere.api.redis.AuthToken;
 import com.educere.api.redis.AuthTokenService;
@@ -16,9 +19,11 @@ import com.educere.api.user.auth.dto.AuthResponse;
 import com.educere.api.user.auth.dto.LoginRequest;
 import com.educere.api.user.auth.dto.Oauth2SignupRequest;
 import com.educere.api.user.auth.dto.SignUpRequest;
+import com.educere.api.user.institution.InstitutionService;
 import com.educere.api.user.member.MemberMapper;
 import com.educere.api.user.member.MemberService;
 import com.educere.api.user.member.dto.MemberResponse;
+import com.educere.api.user.tutor.TutorService;
 import com.educere.api.user.verification.ContactVerificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +38,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,6 +64,12 @@ public class AuthService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private TutorService tutorService;
+
+    @Autowired
+    private InstitutionService institutionService;
+
     private Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     public AuthResponse login(LoginRequest loginRequest) {
@@ -70,16 +82,28 @@ public class AuthService {
     public AuthResponse signUp(SignUpRequest signUpRequest) {
 
         if (memberService.isEmailDuplicate(signUpRequest.getEmail())) {
-            throw new BadRequestException("Member with given email already exists.");
+            throw new BadRequestException("User with given email already exists.");
         }
 
-        Member member = memberService.create(signUpRequest);
-        String token = authenticate(signUpRequest.getEmail(), signUpRequest.getPassword());
+        if (UserType.get(signUpRequest.getUserType()).equals(UserType.TUTOR)) {
+            Tutor tutor = tutorService.create(signUpRequest);
+            String token = authenticate(signUpRequest.getEmail(), signUpRequest.getPassword());
 
-        contactVerificationService.createDeviceVerification(member.getId(), ContactType.EMAIL);
-        contactVerificationService.createDeviceVerification(member.getId(), ContactType.PHONE);
+            contactVerificationService.createDeviceVerification(tutor.getId(), ContactType.EMAIL);
 
-        return buildAuthResponse(member, token);
+            return buildAuthResponse(tutor, token);
+        }
+
+        if (UserType.get(signUpRequest.getUserType()).equals(UserType.INSTITUTION)) {
+            Institution institution = institutionService.create(signUpRequest);
+            String token = authenticate(signUpRequest.getEmail(), signUpRequest.getPassword());
+
+            contactVerificationService.createDeviceVerification(institution.getId(), ContactType.EMAIL);
+
+            return buildAuthResponse(institution, token);
+        }
+
+        throw new BadRequestException("Invalid user type.");
     }
 
     private String authenticate(String email, String password) {
@@ -114,10 +138,6 @@ public class AuthService {
 
     public MemberResponse completeOauth2SignUp(Oauth2SignupRequest oauth2SignupRequest,
                                                UserPrincipal userPrincipal) {
-        if (memberService.isPhoneDuplicate(oauth2SignupRequest.getPhoneNumber())) {
-            throw new BadRequestException("Phone number already in use.");
-        }
-
         Member member = memberService.findById(userPrincipal.getId());
         member = memberService.updateOauth2Member(oauth2SignupRequest, member);
         grantNewAuthentication(member);

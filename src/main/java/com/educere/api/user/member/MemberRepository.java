@@ -17,7 +17,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Boolean existsByEmail(String email);
 
-    Boolean existsByPhoneNumber(String phoneNumber);
-
     List<Member> findAllByLocked(boolean isLocked);
 }

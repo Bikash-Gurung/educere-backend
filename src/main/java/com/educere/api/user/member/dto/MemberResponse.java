@@ -18,7 +18,5 @@ public class MemberResponse {
 
     private String email;
 
-    private String phoneNumber;
-
     private String imageUrl;
 }

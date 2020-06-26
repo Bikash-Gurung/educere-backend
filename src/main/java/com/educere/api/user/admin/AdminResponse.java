@@ -20,8 +20,6 @@ public class AdminResponse {
 
     private String email;
 
-    private String phoneNumber;
-
     private String imageUrl;
 
     private List<String> roles;
