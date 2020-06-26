@@ -1,6 +1,7 @@
 package com.educere.api.entity;
 
 import com.educere.api.common.enums.AuthProvider;
+import com.educere.api.common.enums.UserType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,6 +57,10 @@ public class User extends AuditModel {
 
     @Column
     private String providerId;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

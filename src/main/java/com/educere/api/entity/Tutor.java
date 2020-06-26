@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,15 +13,20 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
-public class Tutor extends AuditModel{
+public class Tutor extends User{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column
+    @Type(type = "uuid-char")
+    private UUID referenceId;
 
     @Column(nullable = false)
     private String firstName;
@@ -31,7 +37,7 @@ public class Tutor extends AuditModel{
     @Column(nullable = false)
     private String lastName;
 
-    @OneToOne(optional = false)
+    @OneToOne
     @JoinColumn(name = "address_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Address address;

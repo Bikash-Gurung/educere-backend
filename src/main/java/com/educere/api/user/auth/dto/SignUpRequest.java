@@ -23,5 +23,5 @@ public class SignUpRequest {
     @NotNull
     private String password;
 
-    private String userType; // INSTITUTION or TUTOR
+    private String userType;
 }

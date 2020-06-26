@@ -10,6 +10,7 @@ import com.educere.api.common.exception.ResourceNotFoundException;
 import com.educere.api.common.exception.TokenExpiredException;
 import com.educere.api.entity.ContactVerification;
 import com.educere.api.entity.Member;
+import com.educere.api.entity.Tutor;
 import com.educere.api.entity.User;
 import com.educere.api.redis.AuthTokenService;
 import com.educere.api.serversentevent.ServerSentEventService;
@@ -62,31 +63,31 @@ public class ContactVerificationService {
     @Autowired
     private ServerSentEventService serverSentEventService;
 
-    public void createDeviceVerification(Long senderId, ContactType contactType) {
-        Member sender = memberService.findById(senderId);
+    public void createDeviceVerification(Long userId, ContactType contactType) {
+        User user = userService.findById(userId);
 
-        if (!isDeviceVerified(sender))
-            checkVerificationToken(sender, contactType);
+        if (!isDeviceVerified(user))
+            checkVerificationToken(user, contactType);
 
         else
             throw new BadRequestException("Your " + contactType.name() + " is already verified.");
     }
 
-    private boolean isDeviceVerified(Member sender) {
-        return sender.isEmailVerified();
+    private boolean isDeviceVerified(User user) {
+        return user.isEmailVerified();
 
     }
 
-    private void checkVerificationToken(Member sender, ContactType contactType) {
-        ContactVerification contactVerification = contactVerificationRepository.existsByUserAndType(sender, contactType)
-                ? checkTwoFAVerificationResendAttempts(sender, contactType)
-                : createVerificationToken(sender, contactType);
+    private void checkVerificationToken(User user, ContactType contactType) {
+        ContactVerification contactVerification = contactVerificationRepository.existsByUserAndType(user, contactType)
+                ? checkTwoFAVerificationResendAttempts(user, contactType)
+                : createVerificationToken(user, contactType);
 
-        sendVerificationMessage(sender, contactVerification.getToken());
+        sendVerificationMessage(user, contactVerification.getToken());
     }
 
-    private ContactVerification checkTwoFAVerificationResendAttempts(Member sender, ContactType contactType) {
-        ContactVerification contactVerification = contactVerificationRepository.findByUserIdAndType(sender.getId(),
+    private ContactVerification checkTwoFAVerificationResendAttempts(User user, ContactType contactType) {
+        ContactVerification contactVerification = contactVerificationRepository.findByUserIdAndType(user.getId(),
                 contactType);
 
         if (contactVerification.getResendAttempt() >= Constants.RESEND_VERIFICATION_CODE_LIMIT) {
@@ -99,10 +100,10 @@ public class ContactVerificationService {
     }
 
     @Transactional
-    public ContactVerification createVerificationToken(Member sender, ContactType contactType) {
+    public ContactVerification createVerificationToken(User user, ContactType contactType) {
         ContactVerification contactVerification = new ContactVerification();
 
-        contactVerification.setUser(sender);
+        contactVerification.setUser(user);
         contactVerification.setType(contactType);
         contactVerification.setToken(generateVerificationCode(contactType));
         contactVerification.setExpiryDate(LocalDateTime.now().plusMinutes(30));
@@ -151,12 +152,12 @@ public class ContactVerificationService {
         return VerificationCodeGenerator.generate();
     }
 
-    private void sendVerificationMessage(Member sender, String token) {
-        sendVerificationEmail(sender, token);
+    private void sendVerificationMessage(User user, String token) {
+        sendVerificationEmail(user, token);
     }
 
-    private void sendVerificationEmail(Member sender, String token) {
-        senderMailService.sendVerificationMail(sender, token);
+    private void sendVerificationEmail(User user, String token) {
+        senderMailService.sendVerificationMail(user, token);
     }
 
     @Transactional

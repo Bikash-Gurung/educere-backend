@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,20 +13,25 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
-public class Institution extends AuditModel{
+public class Institution extends User{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    @Column
+    @Type(type = "uuid-char")
+    private UUID referenceId;
 
-    @OneToOne(optional = false)
+    @Column(nullable = false)
+    private String institutionName;
+
+    @OneToOne
     @JoinColumn(name = "address_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Address address;
