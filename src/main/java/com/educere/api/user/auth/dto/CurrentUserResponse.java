@@ -1,8 +1,10 @@
 package com.educere.api.user.auth.dto;
 
+import com.educere.api.entity.Address;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import java.util.List;
 
 @Getter
@@ -29,4 +31,24 @@ public class CurrentUserResponse {
     private String twitter;
 
     private List<String> roles;
+
+    private Address address;
+
+    @Getter
+    @Setter
+    public static class Address {
+        private String country;
+
+        private String state;
+
+        private String city;
+
+        private String street;
+
+        private String zip;
+
+        private String latitude;
+
+        private String longitude;
+    }
 }

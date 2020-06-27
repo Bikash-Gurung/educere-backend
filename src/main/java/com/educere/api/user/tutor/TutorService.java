@@ -12,10 +12,13 @@ import com.educere.api.entity.User;
 import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.CurrentUserResponse;
 import com.educere.api.user.auth.dto.SignUpRequest;
+import com.educere.api.user.member.dto.UpdateUserRequest;
 import com.educere.api.user.role.RoleService;
+import com.educere.api.user.tutor.dto.TutorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +50,7 @@ public class TutorService {
 
         tutor.setFirstName(signUpRequest.getFirstName());
         tutor.setMiddleName(signUpRequest.getMiddleName());
-        tutor.setMiddleName(signUpRequest.getLastName());
+        tutor.setLastName(signUpRequest.getLastName());
         tutor.setProvider(AuthProvider.SYSTEM);
         tutor.setUserType(UserType.TUTOR);
         tutor.setReferenceId(generateReferenceId());
@@ -80,11 +83,31 @@ public class TutorService {
         tutor.setDp(completeSignupRequest.getDp());
         tutor.setWall(completeSignupRequest.getWall());
         tutor.setAddress(address);
+        tutor.setWebsite(completeSignupRequest.getWebsite());
 
         Role roleUser = roleService.findByName(RoleType.ROLE_TUTOR);
         tutor.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));
 
         return save(tutor);
+    }
+
+    @Transactional
+    public void updateTutorInfo(UpdateUserRequest updateUserRequest, User user) {
+        Tutor tutor = getById(user.getId());
+        tutor.setLinkedin(updateUserRequest.getLinkedin());
+        tutor.setGithub(updateUserRequest.getGithub());
+        tutor.setTwitter(updateUserRequest.getTwitter());
+        tutor.setFacebook(updateUserRequest.getFacebook());
+        tutor.setPhoneOne(updateUserRequest.getPhoneOne());
+        tutor.setPhoneTwo(updateUserRequest.getPhoneTwo());
+        tutor.setPhoneThree(updateUserRequest.getPhoneThree());
+        tutor.setBio(updateUserRequest.getBio());
+        tutor.setDp(updateUserRequest.getDp());
+        tutor.setWall(updateUserRequest.getWall());
+
+        save(tutor);
+
+        addressService.update(updateUserRequest.getAddressRequest(), tutor.getAddress().getId());
     }
 
     public Tutor save(Tutor tutor) {
@@ -96,8 +119,8 @@ public class TutorService {
         return UUID.randomUUID();
     }
 
-    public List<Tutor> getTutors() {
-        return tutorRepository.findAll();
+    public List<TutorResponse> getTutors() {
+        return tutorMapper.toTutorResponseList(tutorRepository.findAll());
     }
 
     public CurrentUserResponse getCurrentTutor(String email) {
@@ -113,6 +136,9 @@ public class TutorService {
         currentUserResponse.setLinkedIn(tutor.getLinkedin());
         currentUserResponse.setFacebook(tutor.getFacebook());
         currentUserResponse.setPhoneNumber(tutor.getPhoneOne());
+        if (tutor.getAddress() != null)
+            currentUserResponse.setAddress(addressService.getCurrentUserAddress(tutor.getAddress()));
+
         currentUserResponse.setRoles(tutor.getRoles().stream()
                 .map(role -> RoleType.valueOf(role.getName().toString()).toString().split("_")[1])
                 .collect(Collectors.toList()));

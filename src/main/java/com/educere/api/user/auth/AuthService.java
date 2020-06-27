@@ -86,7 +86,7 @@ public class AuthService {
 
     public AuthResponse signUp(SignUpRequest signUpRequest) {
 
-        if (memberService.isEmailDuplicate(signUpRequest.getEmail())) {
+        if (userService.isEmailDuplicate(signUpRequest.getEmail())) {
             throw new BadRequestException("User with given email already exists.");
         }
 
