@@ -11,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.Collection;
 
@@ -23,10 +25,14 @@ public class Experties extends AuditModel{
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToMany
-    @JoinColumn(name = "tutor_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Collection<Tutor> tutor;
+    @ManyToOne
+    @JoinTable(
+            name = "tutor_experties",
+            joinColumns = @JoinColumn(
+                    name = "experties_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "tutor_id", referencedColumnName = "id"))
+    private Tutor tutor;
 
     @Column
     private String name;
