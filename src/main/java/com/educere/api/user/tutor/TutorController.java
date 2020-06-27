@@ -5,6 +5,7 @@ import com.educere.api.user.tutor.dto.TutorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,5 +22,11 @@ public class TutorController {
         List<TutorResponse> tutors = tutorService.getTutors();
 
         return new ListResponse(tutors);
+    }
+
+    @GetMapping("/experties")
+    public List<TutorResponse> getTutorByExpertise(@RequestParam String name, @RequestParam String category) {
+
+        return tutorService.fetchTutor(name, category);
     }
 }
