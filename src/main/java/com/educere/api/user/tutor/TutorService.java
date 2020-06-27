@@ -10,6 +10,7 @@ import com.educere.api.entity.Role;
 import com.educere.api.entity.Tutor;
 import com.educere.api.entity.User;
 import com.educere.api.user.auth.dto.CompleteSignupRequest;
+import com.educere.api.user.auth.dto.CurrentUserResponse;
 import com.educere.api.user.auth.dto.SignUpRequest;
 import com.educere.api.user.role.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class TutorService {
@@ -55,8 +57,13 @@ public class TutorService {
         return save(tutor);
     }
 
-    public Tutor getById(Long id){
+    public Tutor getById(Long id) {
         return tutorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+    }
+
+    public Tutor getByEmail(String email) {
+        return tutorRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User", "email",
+                email));
     }
 
     public User updateTutor(CompleteSignupRequest completeSignupRequest, User user) {
@@ -91,5 +98,25 @@ public class TutorService {
 
     public List<Tutor> getTutors() {
         return tutorRepository.findAll();
+    }
+
+    public CurrentUserResponse getCurrentTutor(String email) {
+        Tutor tutor = getByEmail(email);
+        CurrentUserResponse currentUserResponse = new CurrentUserResponse();
+        currentUserResponse.setBio(tutor.getBio());
+        currentUserResponse.setPhoto(tutor.getDp());
+        currentUserResponse.setEmail(tutor.getEmail());
+        currentUserResponse.setName(tutor.getFullName());
+        currentUserResponse.setGithub(tutor.getGithub());
+        currentUserResponse.setWebsite(tutor.getWebsite());
+        currentUserResponse.setTwitter(tutor.getTwitter());
+        currentUserResponse.setLinkedIn(tutor.getLinkedin());
+        currentUserResponse.setFacebook(tutor.getFacebook());
+        currentUserResponse.setPhoneNumber(tutor.getPhoneOne());
+        currentUserResponse.setRoles(tutor.getRoles().stream()
+                .map(role -> RoleType.valueOf(role.getName().toString()).toString().split("_")[1])
+                .collect(Collectors.toList()));
+
+        return currentUserResponse;
     }
 }
