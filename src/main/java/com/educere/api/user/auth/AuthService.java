@@ -84,7 +84,7 @@ public class AuthService {
             throw new BadRequestException("User with given email already exists.");
         }
 
-        if (UserType.get(signUpRequest.getUserType()).equals(UserType.TUTOR)) {
+        if (UserType.valueOf(signUpRequest.getUserType()).equals(UserType.TUTOR)) {
             Tutor tutor = tutorService.create(signUpRequest);
             String token = authenticate(signUpRequest.getEmail(), signUpRequest.getPassword());
 
@@ -93,7 +93,7 @@ public class AuthService {
             return buildAuthResponse(tutor, token);
         }
 
-        if (UserType.get(signUpRequest.getUserType()).equals(UserType.INSTITUTION)) {
+        if (UserType.valueOf(signUpRequest.getUserType()).equals(UserType.INSTITUTION)) {
             Institution institution = institutionService.create(signUpRequest);
             String token = authenticate(signUpRequest.getEmail(), signUpRequest.getPassword());
 
@@ -135,16 +135,14 @@ public class AuthService {
         return memberMapper.toMemberResponse(member);
     }
 
-    public void completeSignUp(CompleteSignupRequest completeSignupRequest,
+    public AuthResponse completeSignUp(CompleteSignupRequest completeSignupRequest,
                                        UserPrincipal userPrincipal) {
-        User user = memberService.findById(userPrincipal.getId());
+        User user = userService.findById(userPrincipal.getId());
         user = user.getUserType().equals(UserType.TUTOR) ?
-                tutorService.updateTutorRole(user) :
-                institutionService.updateInstitutionRole(user);
+                tutorService.updateTutor(completeSignupRequest, user) :
+                institutionService.updateInstitution(completeSignupRequest, user);
         grantNewAuthentication(user);
-        contactVerificationService.createDeviceVerification(user.getId(), ContactType.PHONE);
-
-//        return memberMapper.toMemberResponse(user);
+        return buildAuthResponse(user, authTokenService.getByUserId(user.getId()).getReferenceToken());
     }
 
     private void grantNewAuthentication(User user) {

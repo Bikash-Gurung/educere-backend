@@ -75,11 +75,10 @@ public class AuthController {
     }
 
     @PostMapping("/complete-signup")
-    @PreAuthorize("hasRole('GUEST')")
-    public String completeSignup(@Valid @RequestBody CompleteSignupRequest completeSignupRequest,
+//    @PreAuthorize("hasRole('GUEST')")
+    public AuthResponse completeSignup(@Valid @RequestBody CompleteSignupRequest completeSignupRequest,
                                              @CurrentUser UserPrincipal userPrincipal) {
-        authService.completeSignUp(completeSignupRequest, userPrincipal);
-        return "Signup completed";
+        return authService.completeSignUp(completeSignupRequest, userPrincipal);
     }
 
     @GetMapping("/signout")

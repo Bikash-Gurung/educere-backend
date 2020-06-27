@@ -42,6 +42,11 @@ public class AuthTokenService {
         return authToken.isPresent() ? authToken.get().getJWTtoken() : null;
     }
 
+    public AuthToken getByUserId(Long userId){
+        return authTokenRepository.findByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("AuthToken",
+                "userId", userId));
+    }
+
     public void deleteAuthTokenByUserId(Long userId) {
         AuthToken authToken =
                 authTokenRepository.findByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("AuthToken",
