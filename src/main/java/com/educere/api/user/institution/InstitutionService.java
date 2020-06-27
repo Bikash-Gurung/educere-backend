@@ -109,6 +109,10 @@ public class InstitutionService {
         currentUserResponse.setFacebook(institution.getFacebook());
         currentUserResponse.setPhoneNumber(institution.getPhoneOne());
         currentUserResponse.setName(institution.getInstitutionName());
+
+        if (institution.getAddress() != null)
+            currentUserResponse.setAddress(addressService.getCurrentUserAddress(institution.getAddress()));
+
         currentUserResponse.setRoles(institution.getRoles().stream()
                 .map(role -> RoleType.valueOf(role.getName().toString()).toString().split("_")[1])
                 .collect(Collectors.toList()));
@@ -117,7 +121,7 @@ public class InstitutionService {
     }
 
     @Transactional
-    public void updateInstitutionInfo(UpdateUserRequest updateUserRequest, User user){
+    public void updateInstitutionInfo(UpdateUserRequest updateUserRequest, User user) {
         Institution institution = getById(user.getId());
         institution.setLinkedin(updateUserRequest.getLinkedin());
         institution.setGithub(updateUserRequest.getGithub());
@@ -131,7 +135,8 @@ public class InstitutionService {
         institution.setWall(updateUserRequest.getWall());
         save(institution);
 
-        Address address = addressService.update(updateUserRequest.getAddressRequest(), institution.getAddress().getId());
+        Address address = addressService.update(updateUserRequest.getAddressRequest(),
+                institution.getAddress().getId());
 
     }
 }

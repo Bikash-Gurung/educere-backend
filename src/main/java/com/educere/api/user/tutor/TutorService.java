@@ -91,7 +91,7 @@ public class TutorService {
     }
 
     @Transactional
-    public void updateTutorInfo(UpdateUserRequest updateUserRequest, User user){
+    public void updateTutorInfo(UpdateUserRequest updateUserRequest, User user) {
         Tutor tutor = getById(user.getId());
         tutor.setLinkedin(updateUserRequest.getLinkedin());
         tutor.setGithub(updateUserRequest.getGithub());
@@ -134,6 +134,9 @@ public class TutorService {
         currentUserResponse.setLinkedIn(tutor.getLinkedin());
         currentUserResponse.setFacebook(tutor.getFacebook());
         currentUserResponse.setPhoneNumber(tutor.getPhoneOne());
+        if (tutor.getAddress() != null)
+            currentUserResponse.setAddress(addressService.getCurrentUserAddress(tutor.getAddress()));
+
         currentUserResponse.setRoles(tutor.getRoles().stream()
                 .map(role -> RoleType.valueOf(role.getName().toString()).toString().split("_")[1])
                 .collect(Collectors.toList()));
