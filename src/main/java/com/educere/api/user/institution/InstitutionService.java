@@ -80,6 +80,7 @@ public class InstitutionService {
         institution.setDp(completeSignupRequest.getDp());
         institution.setWall(completeSignupRequest.getWall());
         institution.setAddress(address);
+        institution.setWebsite(completeSignupRequest.getWebsite());
 
         Role roleUser = roleService.findByName(RoleType.ROLE_INSTITUTION);
         institution.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));

@@ -83,6 +83,7 @@ public class TutorService {
         tutor.setDp(completeSignupRequest.getDp());
         tutor.setWall(completeSignupRequest.getWall());
         tutor.setAddress(address);
+        tutor.setWebsite(completeSignupRequest.getWebsite());
 
         Role roleUser = roleService.findByName(RoleType.ROLE_TUTOR);
         tutor.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));
@@ -103,6 +104,7 @@ public class TutorService {
         tutor.setBio(updateUserRequest.getBio());
         tutor.setDp(updateUserRequest.getDp());
         tutor.setWall(updateUserRequest.getWall());
+
         save(tutor);
 
         addressService.update(updateUserRequest.getAddressRequest(), tutor.getAddress().getId());
