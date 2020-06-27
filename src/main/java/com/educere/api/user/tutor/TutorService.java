@@ -47,7 +47,7 @@ public class TutorService {
 
         tutor.setFirstName(signUpRequest.getFirstName());
         tutor.setMiddleName(signUpRequest.getMiddleName());
-        tutor.setMiddleName(signUpRequest.getLastName());
+        tutor.setLastName(signUpRequest.getLastName());
         tutor.setProvider(AuthProvider.SYSTEM);
         tutor.setUserType(UserType.TUTOR);
         tutor.setReferenceId(generateReferenceId());
