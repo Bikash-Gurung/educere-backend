@@ -21,9 +21,6 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
-    @Autowired
-    private MemberMapper memberMapper;
-
     @GetMapping("")
     @PreAuthorize("hasRole('USER')")
     public MemberResponse getCurrentMember(@CurrentUser UserPrincipal userPrincipal) {
