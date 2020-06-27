@@ -25,8 +25,9 @@ public class TutorController {
     }
 
     @GetMapping("/experties")
-    public List<TutorResponse> getTutorByExpertise(@RequestParam String name, @RequestParam String category) {
+    public ListResponse getTutorByExpertise(@RequestParam String name, @RequestParam String category) {
 
-        return tutorService.fetchTutor(name, category);
+        List<TutorResponse> tutors=tutorService.fetchTutor(name, category);
+        return new ListResponse(tutors);
     }
 }
