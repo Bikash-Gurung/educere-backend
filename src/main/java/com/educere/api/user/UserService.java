@@ -45,4 +45,8 @@ public class UserService {
         user.setLockedReason(reason);
         save(user);
     }
+
+    public Boolean isEmailDuplicate(String email) {
+        return userRepository.existsByEmail(email);
+    }
 }
