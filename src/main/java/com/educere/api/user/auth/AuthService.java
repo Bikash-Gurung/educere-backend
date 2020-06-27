@@ -17,7 +17,7 @@ import com.educere.api.user.auth.dto.AccessTokenRequest;
 import com.educere.api.user.auth.dto.AccessTokenResponse;
 import com.educere.api.user.auth.dto.AuthResponse;
 import com.educere.api.user.auth.dto.LoginRequest;
-import com.educere.api.user.auth.dto.Oauth2SignupRequest;
+import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.SignUpRequest;
 import com.educere.api.user.institution.InstitutionService;
 import com.educere.api.user.member.MemberMapper;
@@ -38,7 +38,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,7 +84,7 @@ public class AuthService {
             throw new BadRequestException("User with given email already exists.");
         }
 
-        if (UserType.get(signUpRequest.getUserType()).equals(UserType.TUTOR)) {
+        if (UserType.valueOf(signUpRequest.getUserType()).equals(UserType.TUTOR)) {
             Tutor tutor = tutorService.create(signUpRequest);
             String token = authenticate(signUpRequest.getEmail(), signUpRequest.getPassword());
 
@@ -94,7 +93,7 @@ public class AuthService {
             return buildAuthResponse(tutor, token);
         }
 
-        if (UserType.get(signUpRequest.getUserType()).equals(UserType.INSTITUTION)) {
+        if (UserType.valueOf(signUpRequest.getUserType()).equals(UserType.INSTITUTION)) {
             Institution institution = institutionService.create(signUpRequest);
             String token = authenticate(signUpRequest.getEmail(), signUpRequest.getPassword());
 
@@ -136,20 +135,20 @@ public class AuthService {
         return memberMapper.toMemberResponse(member);
     }
 
-    public MemberResponse completeOauth2SignUp(Oauth2SignupRequest oauth2SignupRequest,
-                                               UserPrincipal userPrincipal) {
-        Member member = memberService.findById(userPrincipal.getId());
-        member = memberService.updateOauth2Member(oauth2SignupRequest, member);
-        grantNewAuthentication(member);
-        contactVerificationService.createDeviceVerification(member.getId(), ContactType.PHONE);
-
-        return memberMapper.toMemberResponse(member);
+    public AuthResponse completeSignUp(CompleteSignupRequest completeSignupRequest,
+                                       UserPrincipal userPrincipal) {
+        User user = userService.findById(userPrincipal.getId());
+        user = user.getUserType().equals(UserType.TUTOR) ?
+                tutorService.updateTutor(completeSignupRequest, user) :
+                institutionService.updateInstitution(completeSignupRequest, user);
+        grantNewAuthentication(user);
+        return buildAuthResponse(user, authTokenService.getByUserId(user.getId()).getReferenceToken());
     }
 
-    private void grantNewAuthentication(Member sender) {
+    private void grantNewAuthentication(User user) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authentication.getAuthorities());
-        List<String> privileges = UserPrincipal.getPrivileges(sender.getRoles());
+        List<String> privileges = UserPrincipal.getPrivileges(user.getRoles());
 
         for (String privilege : privileges) {
             updatedAuthorities.add(new SimpleGrantedAuthority(privilege));

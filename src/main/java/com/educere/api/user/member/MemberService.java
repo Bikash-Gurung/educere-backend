@@ -6,7 +6,7 @@ import com.educere.api.common.enums.RoleType;
 import com.educere.api.common.exception.ResourceNotFoundException;
 import com.educere.api.entity.Member;
 import com.educere.api.entity.Role;
-import com.educere.api.user.auth.dto.Oauth2SignupRequest;
+import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.SignUpRequest;
 import com.educere.api.user.member.dto.MemberResponse;
 import com.educere.api.user.role.RoleService;
@@ -73,7 +73,7 @@ public class MemberService {
         return save(member);
     }
 
-    public Member updateOauth2Member(Oauth2SignupRequest oauth2SignupRequest, Member member) {
+    public Member updateOauth2Member(CompleteSignupRequest completeSignupRequest, Member member) {
         Role roleUser = roleService.findByName(RoleType.ROLE_USER);
         member.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));
 
