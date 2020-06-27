@@ -8,16 +8,23 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import java.util.Collection;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Tutor extends User{
 
     @Id
@@ -77,5 +84,8 @@ public class Tutor extends User{
 
     @Column
     private boolean status = true;
+
+    @OneToMany(mappedBy = "tutor")
+    private Collection<Experties> experties;
 
 }
