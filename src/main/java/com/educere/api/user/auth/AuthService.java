@@ -6,6 +6,7 @@ import com.educere.api.common.enums.UserType;
 import com.educere.api.common.exception.BadRequestException;
 import com.educere.api.entity.Institution;
 import com.educere.api.entity.Member;
+import com.educere.api.entity.Role;
 import com.educere.api.entity.Tutor;
 import com.educere.api.entity.User;
 import com.educere.api.redis.AuthToken;
@@ -16,6 +17,7 @@ import com.educere.api.user.UserService;
 import com.educere.api.user.auth.dto.AccessTokenRequest;
 import com.educere.api.user.auth.dto.AccessTokenResponse;
 import com.educere.api.user.auth.dto.AuthResponse;
+import com.educere.api.user.auth.dto.CurrentUserResponse;
 import com.educere.api.user.auth.dto.LoginRequest;
 import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.SignUpRequest;
@@ -23,6 +25,7 @@ import com.educere.api.user.institution.InstitutionService;
 import com.educere.api.user.member.MemberMapper;
 import com.educere.api.user.member.MemberService;
 import com.educere.api.user.member.dto.MemberResponse;
+import com.educere.api.user.role.RoleService;
 import com.educere.api.user.tutor.TutorService;
 import com.educere.api.user.verification.ContactVerificationService;
 import org.slf4j.Logger;
@@ -68,6 +71,9 @@ public class AuthService {
 
     @Autowired
     private InstitutionService institutionService;
+
+    @Autowired
+    private RoleService roleService;
 
     private Logger logger = LoggerFactory.getLogger(AuthService.class);
 
@@ -169,5 +175,12 @@ public class AuthService {
         authTokenService.deleteAuthTokenByReferenceToken(accessTokenRequest.getReferenceToken());
 
         return new AccessTokenResponse(referenceToken);
+    }
+
+    public CurrentUserResponse getCurrentUser(UserPrincipal userPrincipal) {
+        if (userService.findByEmail(userPrincipal.getEmail()).isType(UserType.TUTOR))
+            return tutorService.getCurrentTutor(userPrincipal.getEmail());
+
+        return institutionService.getCurrentInstitution(userPrincipal.getEmail());
     }
 }

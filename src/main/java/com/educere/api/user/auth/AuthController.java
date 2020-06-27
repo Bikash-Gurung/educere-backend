@@ -7,6 +7,7 @@ import com.educere.api.security.UserPrincipal;
 import com.educere.api.user.auth.dto.AccessTokenRequest;
 import com.educere.api.user.auth.dto.AccessTokenResponse;
 import com.educere.api.user.auth.dto.AuthResponse;
+import com.educere.api.user.auth.dto.CurrentUserResponse;
 import com.educere.api.user.auth.dto.LoginRequest;
 import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.SignUpRequest;
@@ -114,5 +115,11 @@ public class AuthController {
     @PostMapping("/token")
     public AccessTokenResponse refreshAccessToken(@Valid @RequestBody AccessTokenRequest accessTokenRequest) {
         return authService.refreshAccessToken(accessTokenRequest);
+    }
+
+    @GetMapping("/users")
+    @PreAuthorize("hasAnyRole('GUEST','TUTOR','INSTITUTION','ADMIN')")
+    public CurrentUserResponse getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
+        return authService.getCurrentUser(userPrincipal);
     }
 }

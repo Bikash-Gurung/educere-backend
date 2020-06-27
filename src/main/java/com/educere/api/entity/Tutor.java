@@ -14,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 @Getter
@@ -78,4 +80,10 @@ public class Tutor extends User{
     @Column
     private boolean status = true;
 
+    public String getFullName() {
+        return Stream
+                .of(this.firstName, this.middleName, this.lastName)
+                .filter(s -> s != null && !s.isEmpty())
+                .collect(Collectors.joining(" "));
+    }
 }
