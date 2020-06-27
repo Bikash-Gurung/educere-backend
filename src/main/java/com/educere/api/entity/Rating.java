@@ -12,8 +12,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import java.util.Collection;
 
 @Entity
 @Getter
@@ -30,7 +28,7 @@ public class Rating {
     private User user;
 
     @Column
-    private long star;
+    private Long star;
 
     @Column(columnDefinition = "TEXT")
     private String comment;
