@@ -12,12 +12,14 @@ import com.educere.api.entity.User;
 import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.CurrentUserResponse;
 import com.educere.api.user.auth.dto.SignUpRequest;
+import com.educere.api.user.member.dto.UpdateUserRequest;
 import com.educere.api.user.role.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -112,5 +114,24 @@ public class InstitutionService {
                 .collect(Collectors.toList()));
 
         return currentUserResponse;
+    }
+
+    @Transactional
+    public void updateInstitutionInfo(UpdateUserRequest updateUserRequest, User user){
+        Institution institution = getById(user.getId());
+        institution.setLinkedin(updateUserRequest.getLinkedin());
+        institution.setGithub(updateUserRequest.getGithub());
+        institution.setTwitter(updateUserRequest.getTwitter());
+        institution.setFacebook(updateUserRequest.getFacebook());
+        institution.setPhoneOne(updateUserRequest.getPhoneOne());
+        institution.setPhoneTwo(updateUserRequest.getPhoneTwo());
+        institution.setPhoneThree(updateUserRequest.getPhoneThree());
+        institution.setBio(updateUserRequest.getBio());
+        institution.setDp(updateUserRequest.getDp());
+        institution.setWall(updateUserRequest.getWall());
+        save(institution);
+
+        Address address = addressService.update(updateUserRequest.getAddressRequest(), institution.getAddress().getId());
+
     }
 }

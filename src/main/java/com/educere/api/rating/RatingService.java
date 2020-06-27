@@ -4,7 +4,7 @@ import com.educere.api.entity.Rating;
 import com.educere.api.entity.User;
 import com.educere.api.security.UserPrincipal;
 import com.educere.api.user.UserService;
-import com.educere.api.user.tutor.dto.RatingRequest;
+import com.educere.api.rating.dto.RatingRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

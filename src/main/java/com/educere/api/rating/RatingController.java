@@ -3,7 +3,7 @@ package com.educere.api.rating;
 import com.educere.api.common.ListResponse;
 import com.educere.api.security.CurrentUser;
 import com.educere.api.security.UserPrincipal;
-import com.educere.api.user.tutor.dto.RatingRequest;
+import com.educere.api.rating.dto.RatingRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

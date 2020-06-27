@@ -12,11 +12,13 @@ import com.educere.api.entity.User;
 import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.CurrentUserResponse;
 import com.educere.api.user.auth.dto.SignUpRequest;
+import com.educere.api.user.member.dto.UpdateUserRequest;
 import com.educere.api.user.role.RoleService;
 import com.educere.api.user.tutor.dto.TutorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,6 +88,24 @@ public class TutorService {
         tutor.setRoles(new ArrayList<>(Collections.singletonList(roleUser)));
 
         return save(tutor);
+    }
+
+    @Transactional
+    public void updateTutorInfo(UpdateUserRequest updateUserRequest, User user){
+        Tutor tutor = getById(user.getId());
+        tutor.setLinkedin(updateUserRequest.getLinkedin());
+        tutor.setGithub(updateUserRequest.getGithub());
+        tutor.setTwitter(updateUserRequest.getTwitter());
+        tutor.setFacebook(updateUserRequest.getFacebook());
+        tutor.setPhoneOne(updateUserRequest.getPhoneOne());
+        tutor.setPhoneTwo(updateUserRequest.getPhoneTwo());
+        tutor.setPhoneThree(updateUserRequest.getPhoneThree());
+        tutor.setBio(updateUserRequest.getBio());
+        tutor.setDp(updateUserRequest.getDp());
+        tutor.setWall(updateUserRequest.getWall());
+        save(tutor);
+
+        addressService.update(updateUserRequest.getAddressRequest(), tutor.getAddress().getId());
     }
 
     public Tutor save(Tutor tutor) {
