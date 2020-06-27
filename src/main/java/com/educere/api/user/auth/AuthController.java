@@ -75,7 +75,7 @@ public class AuthController {
     }
 
     @PostMapping("/complete-signup")
-//    @PreAuthorize("hasRole('GUEST')")
+    @PreAuthorize("hasRole('GUEST')")
     public AuthResponse completeSignup(@Valid @RequestBody CompleteSignupRequest completeSignupRequest,
                                              @CurrentUser UserPrincipal userPrincipal) {
         return authService.completeSignUp(completeSignupRequest, userPrincipal);
