@@ -1,16 +1,14 @@
 package com.educere.api.user.tutor;
 
-import com.educere.api.address.AddressRepository;
+import com.educere.api.address.AddressService;
 import com.educere.api.common.enums.AuthProvider;
 import com.educere.api.common.enums.RoleType;
 import com.educere.api.common.enums.UserType;
 import com.educere.api.common.exception.ResourceNotFoundException;
 import com.educere.api.entity.Address;
-import com.educere.api.entity.Institution;
 import com.educere.api.entity.Role;
 import com.educere.api.entity.Tutor;
 import com.educere.api.entity.User;
-import com.educere.api.user.auth.dto.AddressRequest;
 import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.SignUpRequest;
 import com.educere.api.user.role.RoleService;
@@ -38,7 +36,7 @@ public class TutorService {
     private TutorMapper tutorMapper;
 
     @Autowired
-    private AddressRepository addressRepository;
+    private AddressService addressService;
 
     public Tutor create(SignUpRequest signUpRequest) {
         Role roleGuest = roleService.findByName(RoleType.ROLE_GUEST);
@@ -61,17 +59,7 @@ public class TutorService {
     }
 
     public User updateTutor(CompleteSignupRequest completeSignupRequest, User user) {
-        AddressRequest addressRequest = completeSignupRequest.getAddress();
-        Address address = new Address();
-        address.setCountry(addressRequest.getCountry());
-        address.setState(addressRequest.getState());
-        address.setCity(addressRequest.getCity());
-        address.setStreet(addressRequest.getStreet());
-        address.setZip(addressRequest.getZip());
-        address.setLatitude(addressRequest.getLongitude());
-        address.setLongitude(addressRequest.getLongitude());
-        address = addressRepository.save(address);
-
+        Address address = addressService.create(completeSignupRequest.getAddress());
         Tutor tutor = getById(user.getId());
         tutor.setLinkedin(completeSignupRequest.getLinkedin());
         tutor.setGithub(completeSignupRequest.getGithub());

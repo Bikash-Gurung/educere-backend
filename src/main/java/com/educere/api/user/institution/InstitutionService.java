@@ -1,21 +1,17 @@
 package com.educere.api.user.institution;
 
-import com.educere.api.address.AddressRepository;
+import com.educere.api.address.AddressService;
 import com.educere.api.common.enums.AuthProvider;
 import com.educere.api.common.enums.RoleType;
 import com.educere.api.common.enums.UserType;
-import com.educere.api.common.exception.BadRequestException;
 import com.educere.api.common.exception.ResourceNotFoundException;
 import com.educere.api.entity.Address;
 import com.educere.api.entity.Institution;
 import com.educere.api.entity.Role;
 import com.educere.api.entity.User;
-import com.educere.api.user.auth.dto.AddressRequest;
 import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.SignUpRequest;
-import com.educere.api.user.member.MemberMailService;
 import com.educere.api.user.role.RoleService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +39,7 @@ public class InstitutionService {
     private InstitutionMapper institutionMapper;
 
     @Autowired
-    private AddressRepository addressRepository;
+    private AddressService addressService;
 
     private static final Logger logger = LoggerFactory.getLogger(InstitutionService.class);
 
@@ -67,18 +63,7 @@ public class InstitutionService {
     }
 
     public User updateInstitution(CompleteSignupRequest completeSignupRequest, User user) {
-
-        AddressRequest addressRequest = completeSignupRequest.getAddress();
-        Address address = new Address();
-        address.setCountry(addressRequest.getCountry());
-        address.setState(addressRequest.getState());
-        address.setCity(addressRequest.getCity());
-        address.setStreet(addressRequest.getStreet());
-        address.setZip(addressRequest.getZip());
-        address.setLatitude(addressRequest.getLongitude());
-        address.setLongitude(addressRequest.getLongitude());
-        address = addressRepository.save(address);
-
+        Address address = addressService.create(completeSignupRequest.getAddress());
         Institution institution = getById(user.getId());
         institution.setLinkedin(completeSignupRequest.getLinkedin());
         institution.setGithub(completeSignupRequest.getGithub());
