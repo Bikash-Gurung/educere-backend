@@ -8,6 +8,9 @@ import com.educere.api.user.tutor.TutorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class ExpertiesService {
 
@@ -20,13 +23,17 @@ public class ExpertiesService {
     @Autowired
     private TutorService tutorService;
 
-    public ExpertiesResponse addExperties(ExpertiesRequest request, Long tutorId) {
+    public List<ExpertiesResponse> addExperties(List<ExpertiesRequest> request, Long tutorId) {
 
         Tutor tutor = tutorService.getById(tutorId);
-        Experties experties = expertiesMapper.toExperties(request);
-        experties.setTutor(tutor);
-        expertiesRepository.save(experties);
+        List<Experties> experties = expertiesMapper.toExpertisesList(request);
+        List<Experties> tutorList = experties.stream().map(experties1 -> {
+            experties1.setTutor(tutor);
+            expertiesRepository.save(experties1);
+            return experties1;
+    }
+        ).collect(Collectors.toList());
 
-        return expertiesMapper.toExpertiesResponse(experties);
+        return expertiesMapper.toExpertisesResponseList(tutorList);
     }
 }

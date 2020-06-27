@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/experties")
@@ -20,7 +21,7 @@ public class ExpertiesController {
     private ExpertiesService expertiesService;
 
     @PostMapping("")
-    public ExpertiesResponse addExperties(@Valid @RequestBody ExpertiesRequest request, @CurrentUser UserPrincipal userPrincipal) {
+    public List<ExpertiesResponse> addExperties(@Valid @RequestBody List<ExpertiesRequest> request, @CurrentUser UserPrincipal userPrincipal) {
 
         return expertiesService.addExperties(request, userPrincipal.getId());
     }
