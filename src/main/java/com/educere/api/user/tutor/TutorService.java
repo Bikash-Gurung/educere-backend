@@ -8,6 +8,7 @@ import com.educere.api.entity.Role;
 import com.educere.api.entity.Tutor;
 import com.educere.api.user.auth.dto.SignUpRequest;
 import com.educere.api.user.role.RoleService;
+import com.educere.api.user.tutor.dto.TutorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,7 @@ public class TutorService {
         return UUID.randomUUID();
     }
 
-    public List<Tutor> getTutors() {
-        return tutorRepository.findAll();
+    public List<TutorResponse> getTutors() {
+        return tutorMapper.toTutorResponseList(tutorRepository.findAll());
     }
 }
