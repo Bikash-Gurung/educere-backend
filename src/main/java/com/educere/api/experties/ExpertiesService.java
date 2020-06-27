@@ -31,8 +31,7 @@ public class ExpertiesService {
             experties1.setTutor(tutor);
             expertiesRepository.save(experties1);
             return experties1;
-    }
-        ).collect(Collectors.toList());
+    }).collect(Collectors.toList());
 
         return expertiesMapper.toExpertisesResponseList(tutorList);
     }
