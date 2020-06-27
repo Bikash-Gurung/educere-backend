@@ -70,4 +70,8 @@ public class User extends AuditModel {
             inverseJoinColumns = @JoinColumn(
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
+
+    public boolean isType(UserType type) {
+        return this.userType.equals(type);
+    }
 }

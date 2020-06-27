@@ -10,6 +10,7 @@ import com.educere.api.entity.Institution;
 import com.educere.api.entity.Role;
 import com.educere.api.entity.User;
 import com.educere.api.user.auth.dto.CompleteSignupRequest;
+import com.educere.api.user.auth.dto.CurrentUserResponse;
 import com.educere.api.user.auth.dto.SignUpRequest;
 import com.educere.api.user.role.RoleService;
 import org.slf4j.Logger;
@@ -18,30 +19,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class InstitutionService {
 
+    private static final Logger logger = LoggerFactory.getLogger(InstitutionService.class);
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @Autowired
     private RoleService roleService;
-
     @Autowired
     private InstitutionRepository institutionRepository;
-
     @Autowired
     private InstitutionMapper institutionMapper;
-
     @Autowired
     private AddressService addressService;
-
-    private static final Logger logger = LoggerFactory.getLogger(InstitutionService.class);
 
     public Institution create(SignUpRequest signUpRequest) {
         Role roleGuest = roleService.findByName(RoleType.ROLE_GUEST);
@@ -57,8 +53,14 @@ public class InstitutionService {
         return save(institution);
     }
 
-    public Institution getById(Long id){
+    public Institution getById(Long id) {
         return institutionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+
+    }
+
+    public Institution getByEmail(String email) {
+        return institutionRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User",
+                "email", email));
 
     }
 
@@ -90,5 +92,25 @@ public class InstitutionService {
 
     private UUID generateReferenceId() {
         return UUID.randomUUID();
+    }
+
+    public CurrentUserResponse getCurrentInstitution(String email) {
+        Institution institution = getByEmail(email);
+        CurrentUserResponse currentUserResponse = new CurrentUserResponse();
+        currentUserResponse.setBio(institution.getBio());
+        currentUserResponse.setPhoto(institution.getDp());
+        currentUserResponse.setEmail(institution.getEmail());
+        currentUserResponse.setGithub(institution.getGithub());
+        currentUserResponse.setWebsite(institution.getWebsite());
+        currentUserResponse.setTwitter(institution.getTwitter());
+        currentUserResponse.setLinkedIn(institution.getLinkedin());
+        currentUserResponse.setFacebook(institution.getFacebook());
+        currentUserResponse.setPhoneNumber(institution.getPhoneOne());
+        currentUserResponse.setName(institution.getInstitutionName());
+        currentUserResponse.setRoles(institution.getRoles().stream()
+                .map(role -> RoleType.valueOf(role.getName().toString()).toString().split("_")[1])
+                .collect(Collectors.toList()));
+
+        return currentUserResponse;
     }
 }

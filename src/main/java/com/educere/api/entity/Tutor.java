@@ -20,6 +20,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Entity
 @Getter
@@ -88,4 +90,10 @@ public class Tutor extends User{
     @OneToMany(mappedBy = "tutor")
     private Collection<Experties> experties;
 
+    public String getFullName() {
+        return Stream
+                .of(this.firstName, this.middleName, this.lastName)
+                .filter(s -> s != null && !s.isEmpty())
+                .collect(Collectors.joining(" "));
+    }
 }
