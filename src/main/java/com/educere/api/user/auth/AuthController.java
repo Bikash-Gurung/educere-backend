@@ -8,7 +8,7 @@ import com.educere.api.user.auth.dto.AccessTokenRequest;
 import com.educere.api.user.auth.dto.AccessTokenResponse;
 import com.educere.api.user.auth.dto.AuthResponse;
 import com.educere.api.user.auth.dto.LoginRequest;
-import com.educere.api.user.auth.dto.Oauth2SignupRequest;
+import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.SignUpRequest;
 import com.educere.api.user.member.dto.MemberResponse;
 import com.educere.api.user.password.ForgotPasswordRequest;
@@ -74,11 +74,11 @@ public class AuthController {
         return authService.getGuestInfo(userPrincipal.getId());
     }
 
-    @PostMapping("/oauth")
+    @PostMapping("/complete-signup")
     @PreAuthorize("hasRole('GUEST')")
-    public MemberResponse completeOauth2Signup(@Valid @RequestBody Oauth2SignupRequest oauth2SignupRequest,
-                                               @CurrentUser UserPrincipal userPrincipal) {
-        return authService.completeOauth2SignUp(oauth2SignupRequest, userPrincipal);
+    public AuthResponse completeSignup(@Valid @RequestBody CompleteSignupRequest completeSignupRequest,
+                                             @CurrentUser UserPrincipal userPrincipal) {
+        return authService.completeSignUp(completeSignupRequest, userPrincipal);
     }
 
     @GetMapping("/signout")

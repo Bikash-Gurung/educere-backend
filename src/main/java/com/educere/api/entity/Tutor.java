@@ -77,7 +77,7 @@ public class Tutor extends User{
     private String bio;
 
     @Column
-    private String db;
+    private String dp;
 
     @Column
     private String wall;

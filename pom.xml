@@ -9,11 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.educere</groupId>
-    <artifactId>raas-affiliate</artifactId>
+    <artifactId>educere</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>raas-affiliate</name>
-    <description>RAAS-Affiliate api</description>
+    <name>educere</name>
+    <description>Educere API</description>
 
     <profiles>
         <profile>
