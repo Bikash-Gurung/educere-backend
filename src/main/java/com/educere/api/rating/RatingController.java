@@ -21,7 +21,7 @@ public class RatingController {
     @Autowired
     private RatingService ratingService;
 
-    @GetMapping()
+    @GetMapping("")
     @PreAuthorize("hasAnyRole('INSTITUTION','TUTOR')")
     public ListResponse getRatingList(@CurrentUser UserPrincipal userPrincipal) {
         return new ListResponse(ratingService.getRatingList(userPrincipal));
