@@ -1,4 +1,4 @@
-package com.educere.api.user.tutor.dto;
+package com.educere.api.rating.dto;
 
 import lombok.Getter;
 
