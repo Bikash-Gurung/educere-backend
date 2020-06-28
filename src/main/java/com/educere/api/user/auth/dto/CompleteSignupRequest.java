@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class CompleteSignupRequest {
 
+    private String profession;
     private String linkedin;
     private String github;
     private String twitter;

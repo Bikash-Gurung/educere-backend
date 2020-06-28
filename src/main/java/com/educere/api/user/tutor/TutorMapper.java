@@ -13,9 +13,7 @@ public interface TutorMapper {
 
     Tutor toTutor(SignUpRequest signUpRequest);
 
-    Tutor ToTutorResponse(Tutor tutor);
+    Tutor toTutorResponse(Tutor tutor);
 
     List<TutorResponse> toTutorResponseList(List<Tutor> tutors);
-
-
 }

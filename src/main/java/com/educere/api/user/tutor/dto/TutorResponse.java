@@ -9,6 +9,8 @@ import java.util.UUID;
 public class TutorResponse {
     private Long id;
 
+    private String email;
+
     private UUID referenceId;
 
     private String firstName;
@@ -37,7 +39,7 @@ public class TutorResponse {
 
     private String bio;
 
-    private String db;
+    private String dp;
 
     private String wall;
 

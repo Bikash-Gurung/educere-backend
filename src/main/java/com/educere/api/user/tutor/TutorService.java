@@ -77,6 +77,7 @@ public class TutorService {
     public User updateTutor(CompleteSignupRequest completeSignupRequest, User user) {
         Address address = addressService.create(completeSignupRequest.getAddress());
         Tutor tutor = getById(user.getId());
+        tutor.setProfession(completeSignupRequest.getProfession());
         tutor.setLinkedin(completeSignupRequest.getLinkedin());
         tutor.setGithub(completeSignupRequest.getGithub());
         tutor.setTwitter(completeSignupRequest.getTwitter());

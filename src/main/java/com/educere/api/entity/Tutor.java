@@ -46,6 +46,9 @@ public class Tutor extends User{
     @Column(nullable = false)
     private String lastName;
 
+    @Column
+    private String profession;
+
     @OneToOne
     @JoinColumn(name = "address_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
