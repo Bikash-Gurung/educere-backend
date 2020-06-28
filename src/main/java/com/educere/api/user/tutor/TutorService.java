@@ -6,9 +6,11 @@ import com.educere.api.common.enums.RoleType;
 import com.educere.api.common.enums.UserType;
 import com.educere.api.common.exception.ResourceNotFoundException;
 import com.educere.api.entity.Address;
+import com.educere.api.entity.Experties;
 import com.educere.api.entity.Role;
 import com.educere.api.entity.Tutor;
 import com.educere.api.entity.User;
+import com.educere.api.experties.ExpertiesRepository;
 import com.educere.api.user.auth.dto.CompleteSignupRequest;
 import com.educere.api.user.auth.dto.CurrentUserResponse;
 import com.educere.api.user.auth.dto.SignUpRequest;
@@ -43,6 +45,9 @@ public class TutorService {
 
     @Autowired
     private AddressService addressService;
+
+    @Autowired
+    private ExpertiesRepository expertiesRepository;
 
     public Tutor create(SignUpRequest signUpRequest) {
         Role roleGuest = roleService.findByName(RoleType.ROLE_GUEST);
@@ -145,5 +150,18 @@ public class TutorService {
                 .collect(Collectors.toList()));
 
         return currentUserResponse;
+    }
+
+    public List<TutorResponse> fetchTutor(String name, String category) {
+
+        List<Experties> expertiesList = expertiesRepository.fetchAllExperties(name, category);
+
+        List<Tutor> tutors = expertiesList.stream().map(exp -> exp.getTutor()).collect(Collectors.toList());
+
+        tutors.removeAll(Collections.singletonList(null));
+
+        List<Tutor> tutorList = tutors.stream().distinct().collect(Collectors.toList());
+
+        return tutorMapper.toTutorResponseList(tutorList);
     }
 }
